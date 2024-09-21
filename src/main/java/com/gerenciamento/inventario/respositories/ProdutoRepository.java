@@ -1,9 +1,6 @@
 package com.gerenciamento.inventario.respositories;
 
 import com.gerenciamento.inventario.models.Produto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,5 +10,4 @@ public interface ProdutoRepository extends JpaRepository<Produto, String> {
 
     boolean existsByNameAndIdNot(String name, String id);
 
-    Page<Produto> findAll(Specification<Produto> spec, Pageable pageable);
 }

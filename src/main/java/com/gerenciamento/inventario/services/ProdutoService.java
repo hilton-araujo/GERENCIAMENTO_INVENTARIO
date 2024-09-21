@@ -42,7 +42,7 @@ public class ProdutoService {
             Produto produto;
 
             Categoria categoria = categoriaRepository.findById(dadosCadastroProdutoDTO.categoriaId())
-                    .orElseThrow(() -> new RuntimeException("Categoria não encontrado"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria não encontrado"));
 
             boolean produtoNomeExiste = repository.existsByName(dadosCadastroProdutoDTO.name());
             if (produtoNomeExiste) {
@@ -96,18 +96,22 @@ public class ProdutoService {
         }
     }
 
-    public Page<DadosVisualizacaoProdutoDTO> listar(String name, Integer qtd, String categoriaId, String descricao, Boolean ativo, Pageable pageable){
-        Specification<Produto> spec = ProdutoSpecification.buscarProdutos(name, qtd, categoriaId, descricao, ativo);
-        Page<Produto> produtos = repository.findAll(spec, pageable);
+    public List<DadosVisualizacaoProdutoDTO> listar(){
+        List<Produto> produtos = repository.findAll();
+        List<DadosVisualizacaoProdutoDTO> dtos = new ArrayList<>();
 
-        return produtos.map(produto -> new DadosVisualizacaoProdutoDTO(
-                produto.getId(),
-                produto.getName(),
-                produto.getQtd(),
-                produto.getDescricao(),
-                produto.getAtivo(),
-                produto.getCategoria().getName()
-        ));
+        for (Produto produto : produtos) {
+            DadosVisualizacaoProdutoDTO dto = new DadosVisualizacaoProdutoDTO(
+                    produto.getId(),
+                    produto.getName(),
+                    produto.getQtd(),
+                    produto.getDescricao(),
+                    produto.getAtivo(),
+                    produto.getCategoria().getName()
+            );
+            dtos.add(dto);
+        }
+        return dtos;
     }
 
     public DadosVisualizacaoProdutoDTO listarPorId(String id) throws ChangeSetPersister.NotFoundException {

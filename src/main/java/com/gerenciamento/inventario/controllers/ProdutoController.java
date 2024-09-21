@@ -35,22 +35,27 @@ public class ProdutoController {
         }
     }
 
+//    @GetMapping
+//    public ResponseEntity<ResponseApi> listar(
+//            @RequestParam(required = false) String name,
+//            @RequestParam(required = false) Integer qtd,
+//            @RequestParam(required = false) String categoriaId,
+//            @RequestParam(required = false) String descricao,
+//            @RequestParam(required = false) Boolean ativo,
+//            Pageable pageable
+//    ) {
+////        return ResponseEntity.status(HttpStatus.OK).body(new ResponseApi("Todos Produtos do sistema", service.listar()));
+//        try {
+//            Page<DadosVisualizacaoProdutoDTO> produtos = service.listar();
+//            return ResponseEntity.status(HttpStatus.OK).body(new ResponseApi("Produtos encontrados", produtos));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseApi("Erro ao buscar produtos", null));
+//        }
+//    }
+
     @GetMapping
-    public ResponseEntity<ResponseApi> listar(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) Integer qtd,
-            @RequestParam(required = false) String categoriaId,
-            @RequestParam(required = false) String descricao,
-            @RequestParam(required = false) Boolean ativo,
-            Pageable pageable
-    ) {
-//        return ResponseEntity.status(HttpStatus.OK).body(new ResponseApi("Todos Produtos do sistema", service.listar()));
-        try {
-            Page<DadosVisualizacaoProdutoDTO> produtos = service.listar(name, qtd, categoriaId, descricao, ativo, pageable);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseApi("Produtos encontrados", produtos));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseApi("Erro ao buscar produtos", null));
-        }
+    public ResponseEntity<ResponseApi> listar(){
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseApi("Todos Produtos do sistema", service.listar()));
     }
 
     @GetMapping("/{id}")
