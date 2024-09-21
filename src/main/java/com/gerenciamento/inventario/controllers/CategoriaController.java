@@ -21,8 +21,14 @@ public class CategoriaController {
 
     @PostMapping
     public ResponseEntity<ResponseApi> cadastrar(@RequestBody @Valid DadosCadastroCategoriaDTO dto){
-        service.registrar(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi("Categoria cadastrado com sucesso!", null));
+        try {
+            service.registrar(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi("Categoria cadastrado com sucesso!", null));
+        }catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(new ResponseApi(e.getReason(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseApi("Erro ao cadastrar categoria", null));
+        }
     }
 
     @GetMapping
