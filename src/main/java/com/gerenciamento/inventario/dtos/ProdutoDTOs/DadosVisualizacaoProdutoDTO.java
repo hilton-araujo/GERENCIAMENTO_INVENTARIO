@@ -10,6 +10,10 @@ public record DadosVisualizacaoProdutoDTO (
 
         String descricao,
 
+        String codigoBarras,
+
+        String codigo,
+
         Boolean ativo,
 
         String categoria

@@ -21,6 +21,10 @@ public class Produto {
 
     private String name;
 
+    private String codigo;
+
+    private String codigoBarras;
+
     private int qtd;
 
     private String descricao;

@@ -3,6 +3,7 @@ package com.gerenciamento.inventario.services;
 import com.gerenciamento.inventario.dtos.ProdutoDTOs.DadosAtualizarProdutoDTO;
 import com.gerenciamento.inventario.dtos.ProdutoDTOs.DadosCadastroProdutoDTO;
 import com.gerenciamento.inventario.dtos.ProdutoDTOs.DadosVisualizacaoProdutoDTO;
+import com.gerenciamento.inventario.funcoes.GerarCodigos;
 import com.gerenciamento.inventario.models.Categoria;
 import com.gerenciamento.inventario.models.Produto;
 import com.gerenciamento.inventario.models.ProdutoSpecification;
@@ -33,7 +34,22 @@ public class ProdutoService {
         return  repository.findById(id).orElseThrow(ChangeSetPersister.NotFoundException::new);
     }
 
-    public Produto cadastrar(Produto produto){
+    private String gerarCodigo() {
+        String codigo;
+        do {
+            codigo = GerarCodigos.gerarCodigoSeteDigitos();
+        } while (repository.existsByCodigo(codigo));
+        return codigo;
+    }
+
+    public Produto cadastrar(Produto produto) {
+        if (produto.getCodigo() == null || produto.getCodigo().isEmpty()) {
+            produto.setCodigo(gerarCodigo());
+        }
+
+        if (produto.getCodigoBarras() == null || produto.getCodigoBarras().isEmpty()) {
+            produto.setCodigoBarras(GerarCodigos.gerarCodigoBarras());
+        }
         return repository.save(produto);
     }
 
@@ -106,6 +122,8 @@ public class ProdutoService {
                     produto.getName(),
                     produto.getQtd(),
                     produto.getDescricao(),
+                    produto.getCodigoBarras(),
+                    produto.getCodigo(),
                     produto.getAtivo(),
                     produto.getCategoria().getName()
             );
@@ -122,6 +140,8 @@ public class ProdutoService {
                 produto.getName(),
                 produto.getQtd(),
                 produto.getDescricao(),
+                produto.getCodigoBarras(),
+                produto.getCodigo(),
                 produto.getAtivo(),
                 produto.getCategoria().getName()
         );

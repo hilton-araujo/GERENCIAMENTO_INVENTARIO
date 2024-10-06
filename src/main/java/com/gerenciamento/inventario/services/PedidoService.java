@@ -1,6 +1,7 @@
 package com.gerenciamento.inventario.services;
 
 import com.gerenciamento.inventario.dtos.PedidoDTOs.DadosCadastroPedidoDTO;
+import com.gerenciamento.inventario.dtos.PedidoDTOs.DadosListagemPedido;
 import com.gerenciamento.inventario.models.Cliente;
 import com.gerenciamento.inventario.models.Pedido;
 import com.gerenciamento.inventario.models.PrecoProduto;
@@ -10,9 +11,14 @@ import com.gerenciamento.inventario.respositories.PedidoRepository;
 import com.gerenciamento.inventario.respositories.PrecoProdutoRepository;
 import com.gerenciamento.inventario.respositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PedidoService {
@@ -74,5 +80,28 @@ public class PedidoService {
         }
     }
 
+    public List<DadosListagemPedido> listar(String nuit) throws ChangeSetPersister.NotFoundException {
+        // Encontra o cliente pelo nuit
+        Cliente cliente = clienteRespository.findByNuit(nuit)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
+
+        // Busca os pedidos do cliente
+        List<Pedido> pedidos = repository.findByClientNuit(cliente);
+        List<DadosListagemPedido> list = new ArrayList<>();
+
+        // Verifica se o cliente possui pedidos
+        if (pedidos.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhum pedido encontrado para este cliente");
+        }
+
+        for (Pedido pedido : pedidos){
+            DadosListagemPedido dadosListagemPedido = new DadosListagemPedido(
+                    pedido.getClientNuit(),
+                    pedido.getProductId()
+            );
+            list.add(dadosListagemPedido);
+        }
+        return list;
+    }
 
 }

@@ -1,16 +1,16 @@
 package com.gerenciamento.inventario.controllers;
 
 import com.gerenciamento.inventario.dtos.PedidoDTOs.DadosCadastroPedidoDTO;
+import com.gerenciamento.inventario.dtos.PedidoDTOs.DadosListagemPedido;
 import com.gerenciamento.inventario.dtos.Response.ResponseApi;
+import com.gerenciamento.inventario.models.Cliente;
 import com.gerenciamento.inventario.services.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
@@ -30,5 +30,10 @@ public class PedidoController {
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseApi("Erro ao realizar pedido", null));
         }
+    }
+
+    @GetMapping(value = "/{nuit}")
+    public ResponseEntity<ResponseApi> listarTodos(@PathVariable String nuit) throws ChangeSetPersister.NotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseApi("Todos Pedidos do Clientes no sistema", service.listar(nuit)));
     }
 }
