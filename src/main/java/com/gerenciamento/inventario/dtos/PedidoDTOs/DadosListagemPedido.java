@@ -7,8 +7,12 @@ import com.gerenciamento.inventario.models.Produto;
 
 public record DadosListagemPedido (
 
-        Cliente cliente,
+        String produto,
 
-        PrecoProduto produto
+        String precoUnitario,
+
+        int quantidade,
+
+        double valorTotal
 ){
 }

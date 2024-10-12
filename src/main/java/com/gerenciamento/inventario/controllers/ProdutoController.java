@@ -26,7 +26,6 @@ public class ProdutoController {
     public ResponseEntity<ResponseApi> cadastrar(@RequestBody @Valid DadosCadastroProdutoDTO dto) {
         try {
             service.registrar(dto);
-            System.out.println(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi("Produto cadastrado com sucesso!", null));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(new ResponseApi(e.getReason(), null));

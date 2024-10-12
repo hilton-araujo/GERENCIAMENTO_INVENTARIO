@@ -11,9 +11,7 @@ import com.gerenciamento.inventario.respositories.PedidoRepository;
 import com.gerenciamento.inventario.respositories.PrecoProdutoRepository;
 import com.gerenciamento.inventario.respositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -36,7 +34,7 @@ public class PedidoService {
     private PrecoProdutoRepository precoProdutoRepository;
 
 
-    public Pedido create(Pedido pedido){
+    public Pedido create(Pedido pedido) {
         return repository.save(pedido);
     }
 
@@ -54,12 +52,17 @@ public class PedidoService {
             int quantidadeDisponivel = produto.getQtd();
             int quantidadeSolicitada = cadastroPedidoDTO.qtd();
 
-
             if (quantidadeSolicitada > quantidadeDisponivel) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade solicitada excede a quantidade disponível");
             }
 
-            double precoUnitario = Double.parseDouble(precoProduto.getPreco());
+            double precoUnitario;
+            try {
+                precoUnitario = Double.parseDouble(precoProduto.getPreco());
+            } catch (NumberFormatException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Preço inválido para o produto");
+            }
+
             double valorTotal = precoUnitario * quantidadeSolicitada;
 
             produto.setQtd(quantidadeDisponivel - quantidadeSolicitada);
@@ -80,24 +83,26 @@ public class PedidoService {
         }
     }
 
-    public List<DadosListagemPedido> listar(String nuit) throws ChangeSetPersister.NotFoundException {
-        // Encontra o cliente pelo nuit
+    public List<DadosListagemPedido> listar(String nuit) {
         Cliente cliente = clienteRespository.findByNuit(nuit)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
 
-        // Busca os pedidos do cliente
         List<Pedido> pedidos = repository.findByClientNuit(cliente);
-        List<DadosListagemPedido> list = new ArrayList<>();
-
-        // Verifica se o cliente possui pedidos
         if (pedidos.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhum pedido encontrado para este cliente");
         }
 
-        for (Pedido pedido : pedidos){
+        List<DadosListagemPedido> list = new ArrayList<>();
+        for (Pedido pedido : pedidos) {
+            // Supondo que `pedido.getProduto()` retorne um objeto do tipo Produto ou PrecoProduto
+            String nomeProduto = pedido.getProductId().getProduto().getName();
+            String precoUnitario = pedido.getProductId().getPreco(); // Extrair o nome do produto
+
             DadosListagemPedido dadosListagemPedido = new DadosListagemPedido(
-                    pedido.getClientNuit(),
-                    pedido.getProductId()
+                    nomeProduto,
+                    precoUnitario,// Passa o nome do produto
+                    pedido.getQtd(),
+                    pedido.getValorTotal()
             );
             list.add(dadosListagemPedido);
         }

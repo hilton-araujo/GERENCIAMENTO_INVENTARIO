@@ -27,11 +27,18 @@ public class CategoriaService {
         try {
 
             Categoria categoria;
+
+            boolean categiriaNomeExiste = repository.existsByName(dto.name());
+            if (categiriaNomeExiste) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Categoria com o mesmo nome já existe");
+            }
             categoria = new Categoria(dto);
             cadastrar(categoria);
 
-        }catch (Exception exception){
-
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao registrar categoria", e);
         }
     }
 
@@ -57,7 +64,7 @@ public class CategoriaService {
             Categoria categoria = repository.findById(dto.id())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria não encontrada"));
 
-            if (!categoria.getName().equals(dto.name())){
+            if (categoria.getName().equals(dto.name())){
                 boolean existeNome = repository.existsByNameAndIdNot(dto.name(), dto.id());
                 if (existeNome){
                     throw new ResponseStatusException(HttpStatus.CONFLICT, "Categoria com nome " +dto.name() +" já existe");

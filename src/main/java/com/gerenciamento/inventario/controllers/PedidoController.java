@@ -22,6 +22,7 @@ public class PedidoController {
 
     @PostMapping
     public ResponseEntity<ResponseApi> cadastrar(@RequestBody DadosCadastroPedidoDTO dto){
+        System.out.println(dto);
         try {
             service.registrar(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseApi("Pedido realizado com sucesso", null));
